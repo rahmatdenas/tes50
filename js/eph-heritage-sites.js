@@ -51,6 +51,9 @@ function loadPrimaryData() {
           processHashChange();
         })
         .catch(error => {
+          // Cegat error agar tidak teriak jika ini adalah pembunuhan yang disengaja
+          if (error === 'ABORTED') return;
+          
           console.warn("Gagal mengambil data Gambar/Wikipedia dari server.", error);
           applyIntersectionFilter(true);                
           Object.values(Records).forEach(r => r.panelElem = undefined);
@@ -58,8 +61,24 @@ function loadPrimaryData() {
         });
     })
     .catch(error => {
+       // Cegat error utama agar tidak memicu False Alarm!
+       if (error === 'ABORTED') {
+         console.log("Pencarian dibatalkan secara paksa. Kembali ke Beranda.");
+         return; // Hentikan eksekusi, biarkan pengguna damai di Landing Page
+       }
+
        console.error("Data utama gagal dimuat. Cek koneksi atau server Wikidata.", error);
        alert("Maaf, server database sedang sibuk. Coba lagi nanti.");
+       
+       if (typeof resetApp === 'function') resetApp();
+       
+       window.location.hash = ''; 
+       setTimeout(function() {
+         window.location.hash = 'landing';
+         if (typeof window.setMobilePanelExpanded === 'function') {
+           window.setMobilePanelExpanded(true);
+         }
+       }, 50);
     });
 }
 
