@@ -140,6 +140,10 @@ nav li.active a, nav li a.active {
   font-family: "Open Sans", sans-serif;
 }
 
+#landing {
+  font-family: "Open Sans", sans-serif;
+}
+
 #index header {
   padding: 15px 20px;
 }
