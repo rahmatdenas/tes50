@@ -212,7 +212,7 @@ function getSparqlQuery6(qid) {
       OPTIONAL { ?site wdt:P101 ?spesialisasiItem . ?spesialisasiItem rdfs:label ?spesialisasiLabel . FILTER(LANG(?spesialisasiLabel) = "id") }
     `;
   }
-  else if (['Prasasti dan arca', 'Situs arkeologi', 'Artefak'].includes(klaster)) {
+  else if (['Prasasti', 'Situs arkeologi', 'Artefak'].includes(klaster)) {
     // Tanggal temu dimodifikasi mengambil node psv: untuk mendeteksi timePrecision
     selectClause += `(SAMPLE(?tglTemuData) AS ?tglTemu) (SAMPLE(?tempatTemuLabel) AS ?tempatTemu) `;
     whereClause += `
@@ -227,7 +227,7 @@ function getSparqlQuery6(qid) {
     `;
   }
   
-  if (['Prasasti dan arca', 'Lontar', 'Naskah', 'Media massa', 'Publikasi', 'Latar karya sastra'].includes(klaster)) {
+  if (['Prasasti', 'Lontar', 'Naskah', 'Media massa', 'Publikasi', 'Latar karya sastra'].includes(klaster)) {
     selectClause += `(GROUP_CONCAT(DISTINCT ?bhsLabel; separator=", ") AS ?bahasaList) (GROUP_CONCAT(DISTINCT ?bentukLabel; separator=", ") AS ?bentukList) (GROUP_CONCAT(DISTINCT ?penulisLabel; separator=", ") AS ?penulisList) (GROUP_CONCAT(DISTINCT ?subjekLabel; separator=", ") AS ?subjekList) (GROUP_CONCAT(DISTINCT ?kolektorLabel; separator=", ") AS ?kolektorList) `;
     whereClause += `
       OPTIONAL { ?site wdt:P407 ?bhsItem . ?bhsItem rdfs:label ?bhsLabel . FILTER(LANG(?bhsLabel) = "id") }
