@@ -777,6 +777,42 @@ function generateFilterSelect() {
       selectRegion.appendChild(option);
     });
 
+  // === KALKULASI MIN & MAX TAHUN UNTUK SLIDER TIMELINE ===
+  let timelineBox = document.getElementById('timeline-box');
+  let slider = document.getElementById('timeline-slider');
+  let label = document.getElementById('timeline-label');
+  selectedMaxYear = null;
+
+  let minYear = 9999;
+  let maxYear = -9999;
+  Object.values(Records).forEach(r => {
+    if (r.rawTahunBerdiri) {
+      let yr = parseInt(r.rawTahunBerdiri.substring(0, 4));
+      if (yr < minYear) minYear = yr;
+      if (yr > maxYear) maxYear = yr;
+    }
+  });
+
+  // Hanya tampilkan slider jika ada data yang memiliki tahun
+  if (minYear !== 9999 && maxYear !== -9999 && timelineBox) {
+    slider.min = minYear;
+    slider.max = maxYear;
+    slider.value = maxYear;
+    selectedMaxYear = maxYear;
+    label.textContent = `Hingga Tahun: ${maxYear}`;
+    timelineBox.style.display = 'block';
+
+    // Event interaktif saat slider ditarik/digeser
+    slider.oninput = function() {
+      selectedMaxYear = parseInt(this.value);
+      label.textContent = `Hingga Tahun: ${selectedMaxYear}`;
+      applyIntersectionFilter(); // Filter peta secara real-time!
+    };
+  } else if (timelineBox) {
+    timelineBox.style.display = 'none'; 
+  }
+  // ========================================================
+
   applyIntersectionFilter();
   
   if (!isFilterEventAttached) {
@@ -804,7 +840,7 @@ function generateFilterSelect() {
       });
     }
 
-    if (btnAll) {
+ if (btnAll) {
       btnAll.addEventListener('click', function() {
         activeFeatures.clear();
         btnAll.classList.add('active');
@@ -818,6 +854,18 @@ function generateFilterSelect() {
 
         currentSearchQuery = '';
         if (searchInput) searchInput.value = '';
+
+        // ==========================================
+        // PERBAIKAN: Tarik elemen berdasarkan ID agar tidak error scope
+        // ==========================================
+        let sliderElem = document.getElementById('timeline-slider');
+        let labelElem = document.getElementById('timeline-label');
+        
+        if (sliderElem && labelElem) { 
+          sliderElem.value = sliderElem.max; 
+          selectedMaxYear = parseInt(sliderElem.max); 
+          labelElem.textContent = 'Hingga Tahun: ' + selectedMaxYear; 
+        }
 
         applyIntersectionFilter();
       });
@@ -914,18 +962,33 @@ function applyIntersectionFilter(preventZoom = false) {
       }
     }
 
-    let matchUsia = true;
+let matchUsia = true;
     if (currentUsiaFilter.startsWith('usia_')) {
       if (record.rawTahunBerdiri) {
         let tahunBangunan = parseInt(record.rawTahunBerdiri.substring(0, 4));
         let batasUmur = parseInt(currentUsiaFilter.split('_')[1]); 
         let batasTahun = new Date().getFullYear() - batasUmur;
-        
         matchUsia = tahunBangunan <= batasTahun;
       } else {
         matchUsia = false; 
       }
     }
+
+    // === LOGIKA FILTER SLIDER TIMELINE ===
+    let matchTimeline = true;
+    if (selectedMaxYear !== null) {
+      if (record.rawTahunBerdiri) {
+        let tahunBenda = parseInt(record.rawTahunBerdiri.substring(0, 4));
+        // Jika tahun benda lebih tua (lebih kecil) atau sama dengan slider, tampilkan!
+        matchTimeline = tahunBenda <= selectedMaxYear;
+      } else {
+        // Jika entitas TIDAK punya data tahun:
+        // Sembunyikan saat pengguna memainkan slider, Tampilkan jika slider di posisi mentok ujung (Semua).
+        let isAtMax = document.getElementById('timeline-slider') && (selectedMaxYear === parseInt(document.getElementById('timeline-slider').max));
+        matchTimeline = isAtMax;
+      }
+    }
+    // =====================================
     
     return matchRegion && matchFeature && matchSearch && matchUsia;
 
