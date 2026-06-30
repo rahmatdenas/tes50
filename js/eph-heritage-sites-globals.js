@@ -366,12 +366,21 @@ if (['Prasasti', 'Situs arkeologi', 'Artefak', 'Lontar', 'Naskah', 'Lukisan'].in
   // ==========================================
   // BLOK LAINNYA
   // ==========================================
-  if (klaster === 'Media massa') {
-    selectClause += `(GROUP_CONCAT(DISTINCT ?pemredLabel; separator=", ") AS ?pemredList) (GROUP_CONCAT(DISTINCT ?pendiriLabel; separator=", ") AS ?pendiriList) (SAMPLE(?penerbitLabel) AS ?penerbit) `;
+if (klaster === 'Media massa') {
+    selectClause += `(GROUP_CONCAT(DISTINCT ?pemredLabel; separator=", ") AS ?pemredList) (GROUP_CONCAT(DISTINCT ?pendiriLabel; separator=", ") AS ?pendiriList) (SAMPLE(?penerbitLabel) AS ?penerbit) (SAMPLE(?berakhirData) AS ?berakhirPada) `;
     whereClause += `
       OPTIONAL { ?site wdt:P5769 ?pemredItem . ?pemredItem rdfs:label ?pemredLabel . FILTER(LANG(?pemredLabel) = "id") }
       OPTIONAL { ?site wdt:P112 ?pendiriItem . ?pendiriItem rdfs:label ?pendiriLabel . FILTER(LANG(?pendiriLabel) = "id") }
       OPTIONAL { ?site wdt:P123 ?penerbitItem . ?penerbitItem rdfs:label ?penerbitLabel . FILTER(LANG(?penerbitLabel) = "id") }
+      
+      # Berakhir pada (P582)
+      OPTIONAL {
+        ?site p:P582 ?berakhirStmt .
+        ?berakhirStmt psv:P582 ?berakhirNode .
+        ?berakhirNode wikibase:timeValue ?berakhirVal ; 
+                      wikibase:timePrecision ?berakhirPrec .
+        BIND(CONCAT(STR(?berakhirVal), "|", STR(?berakhirPrec)) AS ?berakhirData)
+      }
     `;
   }
   else if (klaster === 'Hidangan') {
