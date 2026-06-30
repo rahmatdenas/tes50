@@ -28,6 +28,7 @@ var PrimaryDataIsLoaded   = false;
 var isAppInitialLoad      = true; // Tambahkan ini!
 var isFetching            = false; // Menandai apakah satpam sedang mencari data
 var activeXhrs            = [];
+var selectedMaxYear       = null; // Variabel penampung nilai slider tahun
 
 window.addEventListener('load', init);
 
@@ -200,7 +201,22 @@ L.control.locate({
     return divElem;
   };
   powered.addTo(Map);
-
+// ==========================================
+  var TimelineControl = L.control({ position: 'bottomright' });
+  TimelineControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'timeline-control-container');
+    div.innerHTML = `
+      <div style="background: rgba(255,255,255,0.95); padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); text-align: center; pointer-events: auto; margin-bottom: 25px; border: 2px solid #882222; display: none;" id="timeline-box">
+        <label id="timeline-label" style="display:block; margin-bottom:8px; font-weight:800; font-size:13px; color:#882222; font-family: sans-serif;">Hingga Tahun: Memuat...</label>
+        <input type="range" id="timeline-slider" min="0" max="100" value="100" style="width: 250px; cursor: pointer; accent-color: #882222;">
+      </div>
+    `;
+    // Mencegah peta ikut bergeser saat pengguna menggeser slider
+    L.DomEvent.disableClickPropagation(div);
+    return div;
+  };
+  TimelineControl.addTo(Map);
+  // ==========================================
 Cluster = new L.markerClusterGroup({
     maxClusterRadius: function(z) {
       if (z <=  15) return 50;
