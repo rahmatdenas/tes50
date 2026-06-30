@@ -802,6 +802,19 @@ function generateFilterSelect() {
     label.textContent = `Hingga Tahun: ${maxYear}`;
     timelineBox.style.display = 'block';
 
+    L.DomEvent.disableClickPropagation(timelineBox);
+    L.DomEvent.disableScrollPropagation(timelineBox);
+
+    // Event interaktif saat slider ditarik/digeser
+    slider.oninput = function() {
+      selectedMaxYear = parseInt(this.value);
+      label.textContent = `Hingga Tahun: ${selectedMaxYear}`;
+      applyIntersectionFilter(); // Filter peta secara real-time!
+    };
+  } else if (timelineBox) {
+    timelineBox.style.display = 'none'; 
+  }
+
     // Event interaktif saat slider ditarik/digeser
     slider.oninput = function() {
       selectedMaxYear = parseInt(this.value);
@@ -982,11 +995,18 @@ let matchUsia = true;
         // Jika tahun benda lebih tua (lebih kecil) atau sama dengan slider, tampilkan!
         matchTimeline = tahunBenda <= selectedMaxYear;
       } else {
-        // Jika entitas TIDAK punya data tahun:
-        // Sembunyikan saat pengguna memainkan slider, Tampilkan jika slider di posisi mentok ujung (Semua).
-        let isAtMax = document.getElementById('timeline-slider') && (selectedMaxYear === parseInt(document.getElementById('timeline-slider').max));
-        matchTimeline = isAtMax;
+        let sliderElem = document.getElementById('timeline-slider');
+        if (sliderElem) {
+          // Cek apakah posisi slider sedang mentok di ujung paling kanan (max)
+          let isAtMax = (selectedMaxYear === parseInt(sliderElem.max));
+          
+          // Jika mentok kanan -> Tampilkan! (matchTimeline = true)
+          // Jika digeser sedikit saja ke kiri -> Sembunyikan! (matchTimeline = false)
+          matchTimeline = isAtMax; 
+        } else {
+          matchTimeline = false;
       }
+    }
     }
     // =====================================
     
