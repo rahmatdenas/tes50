@@ -990,8 +990,8 @@ let matchUsia = true;
     }
     // =====================================
     
-    return matchRegion && matchFeature && matchSearch && matchUsia;
-
+return matchRegion && matchFeature && matchSearch && matchUsia && matchTimeline;
+    
   }).sort((a, b) => {
     if (currentUsiaFilter.startsWith('usia_')) {
       let aHasYear = !!a.rawTahunBerdiri;
