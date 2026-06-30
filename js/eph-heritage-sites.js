@@ -814,16 +814,6 @@ function generateFilterSelect() {
   } else if (timelineBox) {
     timelineBox.style.display = 'none'; 
   }
-
-    // Event interaktif saat slider ditarik/digeser
-    slider.oninput = function() {
-      selectedMaxYear = parseInt(this.value);
-      label.textContent = `Hingga Tahun: ${selectedMaxYear}`;
-      applyIntersectionFilter(); // Filter peta secara real-time!
-    };
-  } else if (timelineBox) {
-    timelineBox.style.display = 'none'; 
-  }
   // ========================================================
 
   applyIntersectionFilter();
