@@ -802,9 +802,6 @@ function generateFilterSelect() {
     label.textContent = `Hingga Tahun: ${maxYear}`;
     timelineBox.style.display = 'block';
 
-    L.DomEvent.disableClickPropagation(timelineBox);
-    L.DomEvent.disableScrollPropagation(timelineBox);
-
     // Event interaktif saat slider ditarik/digeser
     slider.oninput = function() {
       selectedMaxYear = parseInt(this.value);
