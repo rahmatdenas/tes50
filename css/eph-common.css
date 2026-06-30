@@ -754,17 +754,6 @@ position: absolute;
 /* Kelas yang akan ditempelkan oleh JavaScript */
 .cluster-efek-denyut {
   animation: cluster-pulse-ring 1.5s infinite;
-  border-radius: 50% !important; /* Paksa jadi lingkaran */
-  z-index: 1000 !important;
-  
-  /* PENTING: Paksa ukuran persegi agar box-shadow tidak lonjong */
-  width: 30px !important; 
-  height: 30px !important;
-  
-  /* Geser posisi agar pusat lingkaran tetap di titik koordinat marker */
-  margin-top: -7px !important;
-  margin-left: -7px !important;
-  
-  /* Hilangkan background jika mengganggu bentuk lingkaran */
-  background: transparent !important;
+  border-radius: 50%; /* Memastikan bentuk denyutnya melingkar */
+  z-index: 1000 !important; /* Memastikan gelembung ini tampil di atas elemen peta lainnya */
 }
