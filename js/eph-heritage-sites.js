@@ -571,12 +571,32 @@ const labelKamus = {
 
 if (record.dynamicProps && Object.keys(record.dynamicProps).length > 0) {
     
-    // CEGAT WIKIBOOKS: Simpan ke variabel lalu hapus dari antrean agar tidak diproses looping
+    // CEGAT WIKIBOOKS
     if (record.dynamicProps.wikibooks) {
       urlWikibooks = record.dynamicProps.wikibooks;
       delete record.dynamicProps.wikibooks;
     }
 
+    // CEGAT TIPELIST (P31) UNTUK HEADER H2
+    if (record.dynamicProps.tipeList) {
+      // Cari elemen span header berdasarkan QID
+      let headerTextElem = document.getElementById(`header-text-${qid}`);
+      
+      // Jika elemen ditemukan (jendela belum ditutup), timpa teksnya
+      if (headerTextElem && record.dynamicProps.tipeList.trim() !== '') {
+        // Trik agar awal huruf kapital semua (opsional, untuk kerapian)
+        let tipeRapi = record.dynamicProps.tipeList
+          .split(', ')
+          .map(kata => kata.charAt(0).toUpperCase() + kata.slice(1))
+          .join(', ');
+          
+        headerTextElem.textContent = tipeRapi;
+      }
+      // Hapus dari antrean agar tidak diprint di bawah menjadi <p> biasa
+      delete record.dynamicProps.tipeList;
+    }
+
+    // Looping sisanya...
     for (let key in record.dynamicProps) {
       let rawValue = record.dynamicProps[key];
       let formattedValue = rawValue;
@@ -1075,29 +1095,12 @@ articleHtml = `<div class="article main-text nodata"><p>${currentNamaKlaster} in
   }
   
 let wikiUrlUtama = `https://www.wikidata.org/wiki/${qid}`;
-  let tautanSuntingRingkasan = `<a href="${wikiUrlUtama}" target="_blank" class="sunting-link" title="Sunting data di Wikidata" aria-label="Sunting data di Wikidata"></a>`;
+let tautanSuntingRingkasan = `<a href="${wikiUrlUtama}" target="_blank" class="sunting-link" title="Sunting data di Wikidata" aria-label="Sunting data di Wikidata"></a>`;
 
-  // ==========================================
-  // PERBAIKAN 3: RENDER HEADER KLUSTER DINAMIS
-  // ==========================================
-let isBersejarah = false;
-  if (record.rawTahunBerdiri) {
-    let tahunBangunan = parseInt(record.rawTahunBerdiri.substring(0, 4));
-    if (tahunBangunan <= (new Date().getFullYear() - 50)) isBersejarah = true;
-  }
-
-  // Daftar bangunan/struktur fisik yang masuk akal diberi label "Bersejarah"
-  let klasterBisaBersejarah = [
-    'Masjid', 'Gereja & katedral'
-  ]; 
-  
-  let teksJudul = `Informasi ${currentNamaKlaster}`;
-  if (klasterBisaBersejarah.includes(currentNamaKlaster) && isBersejarah) {
-    teksJudul = `Informasi ${currentNamaKlaster} Bersejarah`;
-  }
-
-  let designationsHtml = `<h2 style="margin-top:10px">${teksJudul} ${tautanSuntingRingkasan}</h2>`;
-  designationsHtml += '<ul class="designations">';
+// Hapus logika klasterBisaBersejarah dan isBersejarah.
+// Gunakan span dengan ID spesifik untuk mencegat perubahan teks nanti.
+let designationsHtml = `<h2 style="margin-top:10px"><span id="header-text-${qid}">Informasi</span> ${tautanSuntingRingkasan}</h2>`;
+designationsHtml += '<ul class="designations">';
 
   // Siapkan daftar provinsi & Lokasi
   let arrayProvinsi = Object.values(record.designations).filter(p => p !== 'Tidak dalam Provinsi');
@@ -1187,7 +1190,7 @@ if (record.lat !== undefined && record.lon !== undefined) {
   // Sisa perakitan HTML ke panel...
   let eventsHtmlPlaceholder = `
     <div id="events-container-${qid}" class="loading" style="margin-top: 8px; min-height: 24px;">
-      <div class="loader" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>
+      <div class="loader" style="width: 20px; height: 20px; border-width: 2px; margin-top: 4px;"></div>
     </div>`;
 
   designationsHtml +=
@@ -1199,7 +1202,7 @@ if (record.lat !== undefined && record.lon !== undefined) {
       
   designationsHtml += '</ul>';
 
-  let arsipHtml = `<div id="arsip-container-${qid}" class="loading"><div class="loader" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div></div>`;
+  let arsipHtml = `<div id="arsip-container-${qid}" class="loading"><div class="loader" style="width: 20px; height: 20px; border-width: 2px; margin: 8px;"></div></div>`;
 
   let panelElem = document.createElement('div');
   
